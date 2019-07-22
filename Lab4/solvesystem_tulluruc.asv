@@ -1,0 +1,56 @@
+%Objective: Write your own ODE system solver using the Heun/Improved Euler Method and compare it to ode45.
+%Details: Consider the system of 2 ODEs:
+%x1'=f(t,x1,x2), x2'=g(t,x1,x2)
+%This m-file should be a function which accepts as variables (t0,tN,x0,h), where t0 and tN are the start and end points of the interval on which to solve the ODE, h is the 
+%stepsize, and x0 is a vector for the initial condition of the system of ODEs x(t0)=x0. Name the function solvesystem_<UTORid>.m 
+%(Substitute your UTORid for UTORid). You may also want to pass the functions into the ODE the way ode45 does (check MATLAB labs 2 and 3).
+%Your m-file should return a row vector of times and a matrix of approximate solution values (the first row has the approximation for x1 and the second row has 
+%the approximation for x2).
+%Note: you will need to use a loop to do this exercise. You will also need to recall the Heun/Improved Euler algorithm learned in lectures. 
+
+function [t,M] = solvesystem_tulluruc(f, g, t0, tN, x0, h)
+   
+N = floor((tN - t0)/ h); % to ensure that N is an integer
+t = zeros(1, N+1);
+
+%Instantiate the solution vectors
+x1 = zeros(1, length(t));
+x2 = zeros(1, length(t));
+
+% Initial conditions
+t(1) = t0;
+x1(1) = x0(1);       
+x2(1) = x1(2);
+
+%Instantiate solution matrix
+M = [x1; x2];
+
+for i = 1 : N
+    
+    %Update timestep
+    t(i+1) = t(i) + h;
+    
+    %First step
+    r1x1 = f(t(i),x1(i), x2(i));
+    r1x2 = f(t(i),x1(i), x2(i));
+    
+    %Second step
+    r2x1 = f(t(i+1),x1(i) + (r1x1)*h, x2(i) + (r1x2)*h);
+    r2x2 = g(t(i+1),x1(i) + (r1x1)*h, x2(i) + (r1x2)*h);
+    
+    %"Average slopes" --> IEM
+    x1(i+1) = x1(i) + (h/2) * (r2x1 + r2x2);
+    x2(i+1) = x2(i) + (h/2) * (r2x2 + r1x2)
+    
+    
+    
+end
+
+M(1, :) = x1;
+M(2, :) = x2;
+
+end
+
+
+
+
